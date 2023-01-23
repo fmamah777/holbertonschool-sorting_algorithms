@@ -1,85 +1,62 @@
 #include "sort.h"
+#include <unistd.h>
 
 /**
- * merge - merge two sorted arrays
- * @array: first array
- * @temp: temporary array
- * @size: size of array
+ * swap - swaps 2 elements in an int array
+ * @array: int array
+ * @a: the first element index
+ * @b: the second element index
  */
-void swap(int *a, int *b)
+void swap(int *array, int a, int b)
 {
-	int temp = *a;
-	*a = *b;
-	*b = temp;
+	if (a == b)
+		return;
+	array[a] ^= array[b];
+	array[b] ^= array[a];
+	array[a] ^= array[b];
 }
 
 /**
- * merge - merge two sorted arrays
- * @array: first array
- * @temp: temporary array
+ * heapify - converts array to max heap
+ * @array: int array
+ * @heap_size: size of the array to be heaped
+ * @i: recursive element to set as largest value
  * @size: size of array
  */
-void sort(int *a, int n)
-{
-	int i, j;
-	int temp;
-
-	for (i = 0; i < n - 1; i++)
-	{
-		for (j = 0; j < n - i - 1; j++)
-		{
-			if (a[j] > a[j + 1])
-			{
-				temp = a[j];
-				a[j] = a[j + 1];
-				a[j + 1] = temp;
-			}
-		}
-	}
-}
-
-/**
- * merge - merge two sorted arrays
- * @array: first array
- * @temp: temporary array
- * @size: size of array
- */
-void heapify(int *array, size_t size, size_t i)
+void heapify(int *array, size_t heap_size, size_t i, size_t size)
 {
 	size_t largest = i;
-	size_t left = 2 * i + 1;
-	size_t right = 2 * i + 2;
+	size_t l = 2 * i + 1, r = 2 * i + 2;
 
-	if (left < size && array[left] > array[largest])
-		largest = left;
-	if (right < size && array[right] > array[largest])
-		largest = right;
+	if (l < heap_size && array[l] > array[largest])
+		largest = l;
+	if (r < heap_size && array[r] > array[largest])
+		largest = r;
+
 	if (largest != i)
 	{
-		swap(&array[i], &array[largest]);
-		heapify(array, size, largest);
+		swap(array, i, largest);
+		print_array(array, size);
+		heapify(array, heap_size, largest, size);
 	}
 }
 
 /**
- * heap_sort - sort an array using heap sort
- * @array: array to sort
+ * heap_sort - sorts array using heap_sort
+ * @array: int array to be sorted
  * @size: size of array
  */
 void heap_sort(int *array, size_t size)
 {
-	int i;
-	size_t n = size;
+	size_t i;
 
-	for (i = n / 2 - 1; i >= 0; i--)
+	for (i = size / 2 - 1; i > 0; i--)
+		heapify(array, size, i, size);
+	heapify(array, size, 0, size);
+	for (i = size - 1; i > 0; i--)
 	{
-		heapify(array, n, i);
-	}
-
-	for (i = n - 1; i > 0; i--)
-	{
-		swap(&array[0], &array[i]);
-		n--;
-		heapify(array, n, 0);
+		swap(array, 0, i);
+		print_array(array, size);
+		heapify(array, i, 0, size);
 	}
 }
